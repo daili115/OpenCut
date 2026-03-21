@@ -8,5 +8,13 @@
     "env": {
       "NEXT_PUBLIC_SITE_URL": "https://opencut.vercel.app"
     }
+  },
+  "env": {
+    "DATABASE_URL": {
+      "description": "Supabase PostgreSQL connection string"
+    },
+    "BETTER_AUTH_SECRET": {
+      "description": "Secret key for Better Auth"
+    }
   }
 }
