@@ -6,7 +6,19 @@
   "regions": ["iad1"],
   "build": {
     "env": {
-      "NEXT_PUBLIC_SITE_URL": "https://opencut.vercel.app"
+      "NEXT_PUBLIC_SITE_URL": "https://opencut.vercel.app",
+      "NEXT_PUBLIC_MARBLE_API_URL": "https://api.marblecms.com",
+      "DATABASE_URL": "postgresql://placeholder:placeholder@localhost:5432/opencut",
+      "BETTER_AUTH_SECRET": "placeholder_secret_change_in_production",
+      "UPSTASH_REDIS_REST_URL": "http://localhost:8079",
+      "UPSTASH_REDIS_REST_TOKEN": "placeholder_token",
+      "MARBLE_WORKSPACE_KEY": "placeholder_workspace_key",
+      "FREESOUND_CLIENT_ID": "placeholder_client_id",
+      "FREESOUND_API_KEY": "placeholder_api_key",
+      "CLOUDFLARE_ACCOUNT_ID": "placeholder_account_id",
+      "R2_ACCESS_KEY_ID": "placeholder_access_key",
+      "R2_SECRET_ACCESS_KEY": "placeholder_secret_key",
+      "R2_BUCKET_NAME": "opencut-transcription"
     }
   }
 }
