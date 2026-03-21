@@ -1,4 +1,5 @@
 import type { VisualElement } from "./timeline";
+import type { TransitionType } from "@/lib/transitions";
 
 interface BaseDragData {
 	id: string;
@@ -27,8 +28,14 @@ export interface EffectDragData extends BaseDragData {
 	targetElementTypes: VisualElement["type"][];
 }
 
+export interface TransitionDragData extends BaseDragData {
+	type: "transition";
+	transitionType: TransitionType;
+}
+
 export type TimelineDragData =
 	| MediaDragData
 	| TextDragData
 	| StickerDragData
-	| EffectDragData;
+	| EffectDragData
+	| TransitionDragData;

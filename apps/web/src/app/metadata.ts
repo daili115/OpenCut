@@ -10,14 +10,14 @@ export const baseMetaData: Metadata = {
 		description: SITE_INFO.description,
 		url: SITE_URL,
 		siteName: SITE_INFO.title,
-		locale: "en_US",
+		locale: "zh_CN",
 		type: "website",
 		images: [
 			{
 				url: SITE_INFO.openGraphImage,
 				width: 1200,
 				height: 630,
-				alt: "OpenCut Wordmark",
+				alt: "OpenCut 视频编辑器",
 			},
 		],
 	},

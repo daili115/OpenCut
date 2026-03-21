@@ -85,6 +85,14 @@ export const ACTIONS = {
 		category: "editing",
 		defaultShortcuts: ["w"],
 	},
+	"separate-audio": {
+		description: "Separate audio from video",
+		category: "editing",
+	},
+	"freeze-frame": {
+		description: "Freeze frame at playhead",
+		category: "editing",
+	},
 	"delete-selected": {
 		description: "Delete selected elements",
 		category: "editing",
@@ -150,7 +158,11 @@ export const ACTIONS = {
 
 export type TAction = keyof typeof ACTIONS;
 
-export function getActionDefinition({ action }: { action: TAction }): TActionDefinition {
+export function getActionDefinition({
+	action,
+}: {
+	action: TAction;
+}): TActionDefinition {
 	return ACTIONS[action];
 }
 

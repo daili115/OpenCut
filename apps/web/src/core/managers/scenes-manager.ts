@@ -1,27 +1,28 @@
-import type { EditorCore } from "@/core";
-import type { TimelineTrack, TScene } from "@/types/timeline";
-import { storageService } from "@/services/storage/service";
-import {
-	getMainScene,
-	ensureMainScene,
-	canDeleteScene,
-	findCurrentScene,
-} from "@/lib/scenes";
-import {
-	getBookmarkAtTime,
-	getFrameTime,
-	isBookmarkAtTime,
-} from "@/lib/timeline/bookmarks";
-import { ensureMainTrack } from "@/lib/timeline/track-utils";
-import {
-	CreateSceneCommand,
-	DeleteSceneCommand,
-	MoveBookmarkCommand,
-	RemoveBookmarkCommand,
-	RenameSceneCommand,
-	ToggleBookmarkCommand,
-	UpdateBookmarkCommand,
-} from "@/lib/commands/scene";
+	import type { EditorCore } from "@/core";
+	import type { TimelineTrack, TScene } from "@/types/timeline";
+	import { storageService } from "@/services/storage/service";
+	import {
+		getMainScene,
+		ensureMainScene,
+		canDeleteScene,
+		findCurrentScene,
+	} from "@/lib/scenes";
+	import {
+		getBookmarkAtTime,
+		getFrameTime,
+		isBookmarkAtTime,
+	} from "@/lib/timeline/bookmarks";
+	import { ensureMainTrack } from "@/lib/timeline/track-utils";
+	import {
+		CreateSceneCommand,
+		DeleteSceneCommand,
+		MoveBookmarkCommand,
+		RemoveBookmarkCommand,
+		RenameSceneCommand,
+		ToggleBookmarkCommand,
+		UpdateBookmarkCommand,
+	} from "@/lib/commands/scene";
+	import { toast } from "sonner";
 
 export class ScenesManager {
 	private active: TScene | null = null;
@@ -85,7 +86,12 @@ export class ScenesManager {
 		const targetScene = this.list.find((s) => s.id === sceneId);
 
 		if (!targetScene) {
-			throw new Error("Scene not found");
+			const error = new Error("Scene not found");
+			console.error("Failed to switch scene:", error);
+			toast.error("Scene not found", {
+				description: "The requested scene could not be found"
+			});
+			throw error;
 		}
 
 		const activeProject = this.editor.project.getActive();
@@ -202,12 +208,19 @@ export class ScenesManager {
 						this.editor.save.markDirty({ force: true });
 					}
 				}
+			} else {
+				toast.warning("No scenes found in project", {
+					description: "Creating a new main scene"
+				});
 			}
 		} catch (error) {
 			console.error("Failed to load project scenes:", error);
 			this.list = [];
 			this.active = null;
 			this.notify();
+			toast.error("Failed to load scenes", {
+				description: error instanceof Error ? error.message : "An unknown error occurred"
+			});
 		}
 	}
 

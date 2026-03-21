@@ -24,6 +24,8 @@ export class RendererManager {
 	}
 
 	async saveSnapshot(): Promise<{ success: boolean; error?: string }> {
+		const tempCanvas = document.createElement("canvas");
+
 		try {
 			const renderTree = this.getRenderTree();
 			const activeProject = this.editor.project.getActive();
@@ -48,7 +50,6 @@ export class RendererManager {
 				fps,
 			});
 
-			const tempCanvas = document.createElement("canvas");
 			tempCanvas.width = canvasSize.width;
 			tempCanvas.height = canvasSize.height;
 
@@ -83,6 +84,13 @@ export class RendererManager {
 				success: false,
 				error: error instanceof Error ? error.message : "Unknown error",
 			};
+		} finally {
+			if (tempCanvas && tempCanvas.width > 0) {
+				const context = tempCanvas.getContext("2d");
+				if (context) {
+					context.clearRect(0, 0, tempCanvas.width, tempCanvas.height);
+				}
+			}
 		}
 	}
 

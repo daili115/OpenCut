@@ -1,13 +1,14 @@
-import type { EditorCore } from "@/core";
-import type { AudioClipSource } from "@/lib/media/audio";
-import { createAudioContext, collectAudioClips } from "@/lib/media/audio";
-import {
-	ALL_FORMATS,
-	AudioBufferSink,
-	BlobSource,
-	Input,
-	type WrappedAudioBuffer,
-} from "mediabunny";
+	import type { EditorCore } from "@/core";
+	import type { AudioClipSource } from "@/lib/media/audio";
+	import { createAudioContext, collectAudioClips } from "@/lib/media/audio";
+	import {
+		ALL_FORMATS,
+		AudioBufferSink,
+		BlobSource,
+		Input,
+		type WrappedAudioBuffer,
+	} from "mediabunny";
+	import { toast } from "sonner";
 
 export class AudioManager {
 	private audioContext: AudioContext | null = null;
@@ -373,7 +374,14 @@ export class AudioManager {
 			this.sinks.set(clip.sourceKey, sink);
 			return sink;
 		} catch (error) {
-			console.warn("Failed to initialize audio sink:", error);
+			console.error("Failed to initialize audio sink:", error);
+			toast.error("Audio playback error", {
+				description: `Failed to load audio: ${clip.name || "Unknown file"}`,
+				action: {
+					label: "Dismiss",
+					onClick: () => {},
+				},
+			});
 			return null;
 		}
 	}

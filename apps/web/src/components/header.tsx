@@ -30,19 +30,19 @@ export function Header() {
 
 	const links = [
 		{
-			label: "Roadmap",
+			label: "路线图",
 			href: "/roadmap",
 		},
 		{
-			label: "Contributors",
+			label: "贡献者",
 			href: "/contributors",
 		},
 		{
-			label: "Sponsors",
+			label: "赞助商",
 			href: "/sponsors",
 		},
 		{
-			label: "Blog",
+			label: "博客",
 			href: "/blog",
 		},
 	];
@@ -72,7 +72,7 @@ export function Header() {
 								}}
 							>
 								<HugeiconsIcon icon={Copy01Icon} />
-								Copy SVG
+								复制SVG
 							</ContextMenuItem>
 							<ContextMenuItem
 								onClick={() => {
@@ -83,12 +83,12 @@ export function Header() {
 								}}
 							>
 								<HugeiconsIcon icon={Download01Icon} />
-								Download SVG
+								下载SVG
 							</ContextMenuItem>
 							<Link href="/brand">
 								<ContextMenuItem>
 									<HugeiconsIcon icon={LinkSquare02Icon} />
-									Brand assets
+									品牌资源
 								</ContextMenuItem>
 							</Link>
 						</ContextMenuContent>
@@ -120,12 +120,12 @@ export function Header() {
 						<Link href={SOCIAL_LINKS.github}>
 							<Button className="bg-background text-sm" variant="outline">
 								<HugeiconsIcon icon={GithubIcon} className="size-4" />
-								40k+
+								4万+
 							</Button>
 						</Link>
 						<Link href="/projects">
 							<Button className="text-sm">
-								Projects
+								项目
 								<ArrowRight className="size-4" />
 							</Button>
 						</Link>

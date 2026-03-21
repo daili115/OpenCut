@@ -12,6 +12,8 @@ import {
 import Link from "next/link";
 import { RenameProjectDialog } from "./dialogs/rename-project-dialog";
 import { DeleteProjectDialog } from "./dialogs/delete-project-dialog";
+import { ShortcutsDialog } from "./dialogs/shortcuts-dialog";
+import { UserGuideDialog } from "./dialogs/user-guide-dialog";
 import { useRouter } from "next/navigation";
 import { FaDiscord } from "react-icons/fa6";
 import { ExportButton } from "./export-button";
@@ -19,9 +21,12 @@ import { ThemeToggle } from "../theme-toggle";
 import { DEFAULT_LOGO_URL, SOCIAL_LINKS } from "@/constants/site-constants";
 import { toast } from "sonner";
 import { useEditor } from "@/hooks/use-editor";
-import { CommandIcon, Logout05Icon } from "@hugeicons/core-free-icons";
+import {
+	CommandIcon,
+	Logout05Icon,
+	InformationCircleIcon,
+} from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { ShortcutsDialog } from "./dialogs/shortcuts-dialog";
 import Image from "next/image";
 import { cn } from "@/utils/ui";
 
@@ -42,7 +47,7 @@ export function EditorHeader() {
 
 function ProjectDropdown() {
 	const [openDialog, setOpenDialog] = useState<
-		"delete" | "rename" | "shortcuts" | null
+		"delete" | "rename" | "shortcuts" | "guide" | null
 	>(null);
 	const [isExiting, setIsExiting] = useState(false);
 	const router = useRouter();
@@ -124,14 +129,21 @@ function ProjectDropdown() {
 						disabled={isExiting}
 						icon={<HugeiconsIcon icon={Logout05Icon} />}
 					>
-						Exit project
+						退出项目
+					</DropdownMenuItem>
+
+					<DropdownMenuItem
+						onClick={() => setOpenDialog("guide")}
+						icon={<HugeiconsIcon icon={InformationCircleIcon} />}
+					>
+						使用指南
 					</DropdownMenuItem>
 
 					<DropdownMenuItem
 						onClick={() => setOpenDialog("shortcuts")}
 						icon={<HugeiconsIcon icon={CommandIcon} />}
 					>
-						Shortcuts
+						快捷键
 					</DropdownMenuItem>
 
 					<DropdownMenuSeparator />
@@ -158,6 +170,10 @@ function ProjectDropdown() {
 				onOpenChange={(isOpen) => setOpenDialog(isOpen ? "delete" : null)}
 				onConfirm={handleDeleteProject}
 				projectNames={[activeProject?.metadata.name || ""]}
+			/>
+			<UserGuideDialog
+				isOpen={openDialog === "guide"}
+				onOpenChange={(isOpen) => setOpenDialog(isOpen ? "guide" : null)}
 			/>
 			<ShortcutsDialog
 				isOpen={openDialog === "shortcuts"}

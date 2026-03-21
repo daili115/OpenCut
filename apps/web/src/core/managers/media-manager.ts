@@ -1,9 +1,10 @@
-import type { EditorCore } from "@/core";
-import type { MediaAsset } from "@/types/assets";
-import { storageService } from "@/services/storage/service";
-import { generateUUID } from "@/utils/id";
-import { videoCache } from "@/services/video-cache/service";
-import { hasMediaId } from "@/lib/timeline/element-utils";
+	import type { EditorCore } from "@/core";
+	import type { MediaAsset } from "@/types/assets";
+	import { storageService } from "@/services/storage/service";
+	import { generateUUID } from "@/utils/id";
+	import { videoCache } from "@/services/video-cache/service";
+	import { hasMediaId } from "@/lib/timeline/element-utils";
+	import { toast } from "sonner";
 
 export class MediaManager {
 	private assets: MediaAsset[] = [];
@@ -33,6 +34,9 @@ export class MediaManager {
 			console.error("Failed to save media asset:", error);
 			this.assets = this.assets.filter((asset) => asset.id !== newAsset.id);
 			this.notify();
+			toast.error("Failed to save media", {
+				description: error instanceof Error ? error.message : "Storage error occurred"
+			});
 		}
 	}
 
@@ -76,6 +80,9 @@ export class MediaManager {
 			await storageService.deleteMediaAsset({ projectId, id });
 		} catch (error) {
 			console.error("Failed to delete media asset:", error);
+			toast.error("Failed to delete media", {
+				description: error instanceof Error ? error.message : "Storage error occurred"
+			});
 		}
 	}
 
@@ -91,6 +98,11 @@ export class MediaManager {
 			this.notify();
 		} catch (error) {
 			console.error("Failed to load media assets:", error);
+			this.assets = [];
+			this.notify();
+			toast.error("Failed to load media", {
+				description: error instanceof Error ? error.message : "Storage error occurred"
+			});
 		} finally {
 			this.isLoading = false;
 			this.notify();

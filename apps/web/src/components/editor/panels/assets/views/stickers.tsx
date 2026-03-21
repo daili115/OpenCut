@@ -40,7 +40,14 @@ import { STICKER_CATEGORIES } from "@/constants/sticker-constants";
 import { parseStickerId } from "@/lib/stickers/sticker-id";
 
 export function StickersView() {
-	const { selectedCategory, setSelectedCategory } = useStickersStore();
+	const {
+		selectedCategory,
+		setSelectedCategory,
+		viewMode,
+		setSearchQuery,
+		searchQuery,
+		searchStickers,
+	} = useStickersStore();
 
 	return (
 		<PanelView
@@ -65,13 +72,45 @@ export function StickersView() {
 						</SelectContent>
 					</Select>
 
-					<Button variant="ghost" size="icon">
+					<Button
+						variant="ghost"
+						size="icon"
+						onClick={() => {
+							if (viewMode === "search") {
+								setSearchQuery({ query: "" });
+							}
+						}}
+					>
 						<HugeiconsIcon icon={Search01Icon} className="!size-3.5" />
 					</Button>
 
-					<Button variant="ghost" size="icon">
+					<Button
+						variant="ghost"
+						size="icon"
+						onClick={() => {
+							toast.info("Sticker Settings", {
+								description:
+									"Coming soon: Customize sticker presets and preferences",
+							});
+						}}
+					>
 						<OcSlidersVerticalIcon className="!size-3.5" />
 					</Button>
+
+					{viewMode === "search" && (
+						<input
+							type="text"
+							placeholder="Search stickers..."
+							value={searchQuery}
+							onChange={(e) => setSearchQuery({ query: e.target.value })}
+							className="ml-2 h-8 w-32 rounded-md border border-input bg-background px-2 text-sm outline-none focus-visible:ring-0"
+							onKeyDown={(e) => {
+								if (e.key === "Enter") {
+									searchStickers({ query: searchQuery });
+								}
+							}}
+						/>
+					)}
 				</div>
 			}
 		>
@@ -202,7 +241,9 @@ function StickersContentView() {
 						</div>
 					) : searchQuery ? (
 						<EmptyView message={`No stickers found for "${searchQuery}"`} />
-					) : null}
+					) : (
+						<EmptyView message="Enter a search term to find stickers" />
+					)}
 				</div>
 			)}
 		</div>

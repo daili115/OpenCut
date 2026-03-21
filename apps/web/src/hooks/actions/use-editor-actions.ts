@@ -6,6 +6,8 @@ import { useEditor } from "../use-editor";
 import { useElementSelection } from "../timeline/element/use-element-selection";
 import { useKeyframeSelection } from "../timeline/element/use-keyframe-selection";
 import { getElementsAtTime } from "@/lib/timeline";
+import { DEFAULT_TRANSFORM } from "@/constants/timeline-constants";
+import type { VideoElement, ImageElement } from "@/types/timeline";
 
 export function useEditorActions() {
 	const editor = useEditor();
@@ -202,6 +204,148 @@ export function useEditorActions() {
 				splitTime: currentTime,
 				retainSide: "left",
 			});
+		},
+		undefined,
+	);
+
+	useActionHandler(
+		"separate-audio",
+		() => {
+			const currentTime = editor.playback.getCurrentTime();
+			const elementsToSeparate =
+				selectedElements.length > 0
+					? selectedElements
+					: getElementsAtTime({
+							tracks: editor.timeline.getTracks(),
+							time: currentTime,
+						});
+
+			if (elementsToSeparate.length === 0) return;
+
+			for (const elementRef of elementsToSeparate) {
+				const element = editor.timeline.getElementsWithTracks({
+					elements: [elementRef],
+				})[0]?.element;
+
+				if (!element || element.type !== "video" || element.muted) continue;
+
+				const audioTrackId = editor.timeline.addTrack({
+					type: "audio",
+					index: 0,
+				});
+
+				editor.timeline.insertElement({
+					placement: { mode: "explicit", trackId: audioTrackId },
+					element: {
+						type: "audio",
+						sourceType: "upload",
+						mediaId: element.mediaId,
+						name: `${element.name} (Audio)`,
+						duration: element.duration,
+						startTime: element.startTime,
+						volume: 1,
+						muted: false,
+						trimStart: element.trimStart,
+						trimEnd: element.trimEnd,
+					},
+				});
+
+				editor.timeline.updateElements({
+					updates: [
+						{
+							trackId: elementRef.trackId,
+							elementId: elementRef.elementId,
+							updates: { muted: true },
+						},
+					],
+				});
+			}
+		},
+		undefined,
+	);
+
+	useActionHandler(
+		"freeze-frame",
+		() => {
+			const currentTime = editor.playback.getCurrentTime();
+			const elementsToFreeze =
+				selectedElements.length > 0
+					? selectedElements
+					: getElementsAtTime({
+							tracks: editor.timeline.getTracks(),
+							time: currentTime,
+						});
+
+			if (elementsToFreeze.length === 0) return;
+
+			for (const elementRef of elementsToFreeze) {
+				const result = editor.timeline.getElementsWithTracks({
+					elements: [elementRef],
+				});
+
+				if (!result[0]?.element) continue;
+
+				const { element: sourceElement, track: sourceTrack } = result[0];
+
+				if (sourceElement.type !== "video") continue;
+
+				const splitTime = Math.max(
+					sourceElement.startTime,
+					Math.min(
+						currentTime,
+						sourceElement.startTime + sourceElement.duration,
+					),
+				);
+
+				if (splitTime <= sourceElement.startTime) continue;
+
+				const splitResults = editor.timeline.splitElements({
+					elements: [elementRef],
+					splitTime,
+				});
+
+				if (splitResults.length === 0) continue;
+
+				const rightElementRef = splitResults[0];
+				const rightTrack = editor.timeline.getTrackById({
+					trackId: rightElementRef.trackId,
+				});
+
+				if (!rightTrack || rightTrack.type !== "video") continue;
+
+				const rightElement = rightTrack.elements.find(
+					(e) => e.id === rightElementRef.elementId,
+				) as (VideoElement | ImageElement) | null;
+
+				if (!rightElement) continue;
+
+				const freezePoint =
+					splitTime - sourceElement.startTime + sourceElement.trimStart;
+
+				editor.timeline.insertElement({
+					placement: { mode: "auto", trackType: "video" },
+					element: {
+						type: "image",
+						mediaId: sourceElement.mediaId,
+						name: `${sourceElement.name} (Frozen)`,
+						duration: rightElement.duration,
+						startTime: rightElement.startTime,
+						trimStart: freezePoint,
+						trimEnd: freezePoint + rightElement.duration,
+						hidden: false,
+						transform: rightElement.transform || DEFAULT_TRANSFORM,
+						opacity:
+							typeof rightElement.opacity === "number"
+								? rightElement.opacity
+								: 1,
+						blendMode: rightElement.blendMode || "normal",
+					},
+				});
+
+				editor.timeline.deleteElements({
+					elements: [rightElementRef],
+				});
+			}
 		},
 		undefined,
 	);

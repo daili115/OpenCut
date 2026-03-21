@@ -78,7 +78,9 @@ export function TimelineToolbar({
 function ToolbarLeftSection() {
 	const editor = useEditor();
 	const currentTime = editor.playback.getCurrentTime();
-	const isCurrentlyBookmarked = editor.scenes.isBookmarked({ time: currentTime });
+	const isCurrentlyBookmarked = editor.scenes.isBookmarked({
+		time: currentTime,
+	});
 
 	const handleAction = ({
 		action,
@@ -116,9 +118,10 @@ function ToolbarLeftSection() {
 
 				<ToolbarButton
 					icon={<SplitSquareHorizontal />}
-					tooltip="Separate audio (coming soon)"
-					disabled={true}
-					onClick={({ event: _event }) => {}}
+					tooltip="Separate audio"
+					onClick={({ event }) =>
+						handleAction({ action: "separate-audio", event })
+					}
 				/>
 
 				<ToolbarButton
@@ -131,9 +134,10 @@ function ToolbarLeftSection() {
 
 				<ToolbarButton
 					icon={<HugeiconsIcon icon={SnowIcon} />}
-					tooltip="Freeze frame (coming soon)"
-					disabled={true}
-					onClick={({ event: _event }) => {}}
+					tooltip="Freeze frame"
+					onClick={({ event }) =>
+						handleAction({ action: "freeze-frame", event })
+					}
 				/>
 
 				<ToolbarButton
@@ -149,8 +153,8 @@ function ToolbarLeftSection() {
 				<Tooltip>
 					<ToolbarButton
 						icon={<HugeiconsIcon icon={Bookmark02Icon} />}
-				isActive={isCurrentlyBookmarked}
-					tooltip={isCurrentlyBookmarked ? "Remove bookmark" : "Add bookmark"}
+						isActive={isCurrentlyBookmarked}
+						tooltip={isCurrentlyBookmarked ? "Remove bookmark" : "Add bookmark"}
 						onClick={({ event }) =>
 							handleAction({ action: "toggle-bookmark", event })
 						}

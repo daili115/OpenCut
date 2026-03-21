@@ -63,12 +63,22 @@ export function FontPicker({
 	const [status, setStatus] = useState<"idle" | "loading" | "error">(() =>
 		getCachedFontAtlas() ? "idle" : "loading",
 	);
+	const [localFonts, setLocalFonts] = useState<string[]>(() => {
+		const saved = localStorage.getItem("opencut-local-fonts");
+		return saved ? JSON.parse(saved) : [];
+	});
 	const searchInputRef = useRef<HTMLInputElement>(null);
+	const fileInputRef = useRef<HTMLInputElement>(null);
 
 	const fontNames = useMemo(() => {
-		if (!atlas) return [];
-		return Object.keys(atlas.fonts).sort();
-	}, [atlas]);
+		const googleFonts = atlas ? Object.keys(atlas.fonts).sort() : [];
+		switch (activeTab) {
+			case "my-fonts":
+				return localFonts;
+			default:
+				return googleFonts;
+		}
+	}, [atlas, activeTab, localFonts]);
 
 	const filteredFonts = useMemo(() => {
 		if (!search) return fontNames;
@@ -83,15 +93,49 @@ export function FontPicker({
 
 	const handleSelect = useCallback(
 		async ({ family }: { family: string }) => {
-			try {
-				await loadFullFont({ family });
+			if (localFonts.includes(family)) {
 				onValueChange?.(family);
-			} catch {
-				onValueChange?.(family);
+			} else {
+				try {
+					await loadFullFont({ family });
+					onValueChange?.(family);
+				} catch {
+					onValueChange?.(family);
+				}
 			}
 			setOpen(false);
 		},
-		[onValueChange],
+		[onValueChange, localFonts],
+	);
+
+	const handleLoadLocalFont = useCallback(
+		(event: React.ChangeEvent<HTMLInputElement>) => {
+			const file = event.target.files?.[0];
+			if (!file) return;
+
+			const fontName = file.name.replace(/\.[^/.]+$/, "");
+			const fontUrl = URL.createObjectURL(file);
+
+			const font = new FontFace(fontName, `url(${fontUrl})`);
+			font
+				.load()
+				.then(() => {
+					document.fonts.add(font);
+					const updatedFonts = [...new Set([...localFonts, fontName])];
+					setLocalFonts(updatedFonts);
+					localStorage.setItem(
+						"opencut-local-fonts",
+						JSON.stringify(updatedFonts),
+					);
+					onValueChange?.(fontName);
+				})
+				.catch((error) => {
+					console.error("Failed to load font:", error);
+				});
+
+			event.target.value = "";
+		},
+		[localFonts, onValueChange],
 	);
 
 	// Load atlas on first open if cache is empty (fallback when prefetch hasn't completed)
@@ -226,19 +270,50 @@ export function FontPicker({
 					/>
 				)}
 				<div className="border-t p-1">
+					<input
+						ref={fileInputRef}
+						type="file"
+						accept=".ttf,.otf,.woff,.woff2"
+						className="hidden"
+						onChange={handleLoadLocalFont}
+					/>
 					<Button
 						variant="ghost"
 						size="sm"
 						className="w-full justify-start text-muted-foreground h-8 font-normal"
-						onClick={() => {
-							// TODO: Implement local font loading
-							console.log("Load local fonts clicked");
-						}}
+						onClick={() => fileInputRef.current?.click()}
 					>
 						<Upload className="!size-3.5" />
 						Load local fonts
 					</Button>
 				</div>
+				{localFonts.length > 0 && activeTab === "my-fonts" && (
+					<div className="border-t p-2">
+						<div className="text-xs text-muted-foreground mb-2">
+							{localFonts.length} local font{localFonts.length > 1 ? "s" : ""}{" "}
+							loaded
+						</div>
+						<Button
+							variant="ghost"
+							size="sm"
+							className="w-full justify-start text-destructive h-7 font-normal"
+							onClick={() => {
+								localFonts.forEach((fontName) => {
+									const loadedFonts = Array.from(document.fonts);
+									loadedFonts.forEach((font) => {
+										if (font.family === fontName) {
+											document.fonts.delete(font);
+										}
+									});
+								});
+								setLocalFonts([]);
+								localStorage.removeItem("opencut-local-fonts");
+							}}
+						>
+							Clear all local fonts
+						</Button>
+					</div>
+				)}
 			</PopoverContent>
 		</Popover>
 	);

@@ -194,11 +194,24 @@ export async function processMediaAssets({
 						timeInSeconds: 1,
 					});
 				} catch (error) {
-					console.warn("Video processing failed", error);
+					console.error("Video processing failed:", error);
+					toast.error(`Failed to process video: ${file.name}`, {
+						description: error instanceof Error ? error.message : "Unsupported video format"
+					});
+					URL.revokeObject(url);
+					continue;
 				}
 			} else if (fileType === "audio") {
-				// For audio, we don't set width/height/fps (they'll be undefined)
-				duration = await getMediaDuration({ file });
+				try {
+					duration = await getMediaDuration({ file });
+				} catch (error) {
+					console.error("Audio processing failed:", error);
+					toast.error(`Failed to process audio: ${file.name}`, {
+						description: error instanceof Error ? error.message : "Unsupported audio format"
+					});
+					URL.revokeObject(url);
+					continue;
+				}
 			}
 
 			processedAssets.push({

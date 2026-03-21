@@ -193,6 +193,10 @@ export class ProjectManager {
 			this.updateMetadata(updatedProject);
 		} catch (error) {
 			console.error("Failed to save project:", error);
+			toast.error("Failed to save project", {
+				description: error instanceof Error ? error.message : "Please try again"
+			});
+			throw error;
 		}
 	}
 
@@ -638,16 +642,28 @@ export class ProjectManager {
 		tempCanvas.width = canvasSize.width;
 		tempCanvas.height = canvasSize.height;
 
-		await renderer.renderToCanvas({
-			node: scene,
-			time: 0,
-			targetCanvas: tempCanvas,
-		});
+		try {
+			await renderer.renderToCanvas({
+				node: scene,
+				time: 0,
+				targetCanvas: tempCanvas,
+			});
 
-		const thumbnailDataUrl = tempCanvas.toDataURL("image/png");
+			const thumbnailDataUrl = tempCanvas.toDataURL("image/png");
 
-		await this.updateThumbnail({ thumbnail: thumbnailDataUrl });
-		return true;
+			await this.updateThumbnail({ thumbnail: thumbnailDataUrl });
+			return true;
+		} catch (error) {
+			console.error("Failed to generate thumbnail:", error);
+			return false;
+		} finally {
+			if (tempCanvas && tempCanvas.width > 0) {
+				const context = tempCanvas.getContext("2d");
+				if (context) {
+					context.clearRect(0, 0, tempCanvas.width, tempCanvas.height);
+				}
+			}
+		}
 	}
 
 	private updateMetadata(project: TProject): void {
