@@ -478,8 +478,8 @@ export function useTimelineDragDrop({
 							target: currentTarget,
 							dragData: dragData as EffectDragData,
 						});
-					} else {
-						executeMediaDrop({ target: currentTarget, dragData });
+					} else if (dragData.type === "media") {
+						executeMediaDrop({ target: currentTarget, dragData: dragData as MediaDragData });
 					}
 				} else if (hasFiles) {
 					const scrollContainer = tracksScrollRef?.current;
