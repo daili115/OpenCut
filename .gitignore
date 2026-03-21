@@ -18,3 +18,5 @@ bun.lockb
 
 # Twiggy
 .cursor/rules/file-structure.mdc
+.vercel
+.env*.local

@@ -20,18 +20,19 @@ async function fetchFromMarble<T>({
 	endpoint,
 }: {
 	endpoint: string;
-}): Promise<T> {
+}): Promise<T | null> {
 	try {
 		const response = await fetch(`${url}/${key}/${endpoint}`);
 		if (!response.ok) {
-			throw new Error(
+			console.warn(
 				`Failed to fetch ${endpoint}: ${response.status} ${response.statusText}`,
 			);
+			return null;
 		}
 		return (await response.json()) as T;
 	} catch (error) {
 		console.error(`Error fetching ${endpoint}:`, error);
-		throw error;
+		return null;
 	}
 }
 

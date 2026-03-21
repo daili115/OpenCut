@@ -4,7 +4,14 @@ import { SITE_INFO, SITE_URL } from "@/constants/site-constants";
 
 export async function GET() {
 	try {
-		const { posts } = await getPosts();
+		const result = await getPosts();
+		if (!result) {
+			return new Response("Service temporarily unavailable", {
+				status: 503,
+			});
+		}
+
+		const { posts } = result;
 
 		const feed = new Feed({
 			title: `${SITE_INFO.title} Blog`,
