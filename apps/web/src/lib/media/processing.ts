@@ -198,7 +198,7 @@ export async function processMediaAssets({
 					toast.error(`Failed to process video: ${file.name}`, {
 						description: error instanceof Error ? error.message : "Unsupported video format"
 					});
-					URL.revokeObject(url);
+					URL.revokeObjectURL(url);
 					continue;
 				}
 			} else if (fileType === "audio") {
@@ -209,7 +209,7 @@ export async function processMediaAssets({
 					toast.error(`Failed to process audio: ${file.name}`, {
 						description: error instanceof Error ? error.message : "Unsupported audio format"
 					});
-					URL.revokeObject(url);
+					URL.revokeObjectURL(url);
 					continue;
 				}
 			}
