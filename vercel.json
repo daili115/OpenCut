@@ -4,62 +4,9 @@
   "installCommand": "bun install",
   "framework": "nextjs",
   "regions": ["iad1"],
-  "env": {
-    "NEXT_PUBLIC_SITE_URL": {
-      "description": "The public URL of your site"
-    },
-    "DATABASE_URL": {
-      "description": "PostgreSQL database connection string"
-    },
-    "BETTER_AUTH_SECRET": {
-      "description": "Secret key for Better Auth"
-    },
-    "UPSTASH_REDIS_REST_URL": {
-      "description": "Upstash Redis REST URL"
-    },
-    "UPSTASH_REDIS_REST_TOKEN": {
-      "description": "Upstash Redis REST token"
-    },
-    "MARBLE_WORKSPACE_KEY": {
-      "description": "Marble CMS workspace key"
-    },
-    "FREESOUND_CLIENT_ID": {
-      "description": "Freesound API client ID"
-    },
-    "FREESOUND_API_KEY": {
-      "description": "Freesound API key"
-    },
-    "CLOUDFLARE_ACCOUNT_ID": {
-      "description": "Cloudflare R2 account ID"
-    },
-    "R2_ACCESS_KEY_ID": {
-      "description": "Cloudflare R2 access key ID"
-    },
-    "R2_SECRET_ACCESS_KEY": {
-      "description": "Cloudflare R2 secret access key"
-    },
-    "R2_BUCKET_NAME": {
-      "description": "Cloudflare R2 bucket name"
-    },
-    "MODAL_TRANSCRIPTION_URL": {
-      "description": "Modal transcription service URL"
-    }
-  },
   "build": {
     "env": {
-      "NEXT_PUBLIC_SITE_URL": "@next_public_site_url",
-      "DATABASE_URL": "@database_url",
-      "BETTER_AUTH_SECRET": "@better_auth_secret",
-      "UPSTASH_REDIS_REST_URL": "@upstash_redis_rest_url",
-      "UPSTASH_REDIS_REST_TOKEN": "@upstash_redis_rest_token",
-      "MARBLE_WORKSPACE_KEY": "@marble_workspace_key",
-      "FREESOUND_CLIENT_ID": "@freesound_client_id",
-      "FREESOUND_API_KEY": "@freesound_api_key",
-      "CLOUDFLARE_ACCOUNT_ID": "@cloudflare_account_id",
-      "R2_ACCESS_KEY_ID": "@r2_access_key_id",
-      "R2_SECRET_ACCESS_KEY": "@r2_secret_access_key",
-      "R2_BUCKET_NAME": "@r2_bucket_name",
-      "MODAL_TRANSCRIPTION_URL": "@modal_transcription_url"
+      "NEXT_PUBLIC_SITE_URL": "https://opencut.vercel.app"
     }
   }
 }
