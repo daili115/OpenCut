@@ -7,6 +7,7 @@ import {
 	getHighestInsertIndexForTrack,
 } from "@/lib/timeline/track-utils";
 import { cloneAnimations } from "@/lib/animation";
+import { calculateTotalDuration } from "@/lib/timeline";
 
 interface DuplicateElementsParams {
 	elements: { trackId: string; elementId: string }[];
@@ -28,6 +29,10 @@ export class DuplicateElementsCommand extends Command {
 		this.savedState = editor.timeline.getTracks();
 		this.previousSelection = editor.selection.getSelectedElements();
 		this.duplicatedElements = [];
+
+		const insertionOffset = this.calculateInsertionOffset({
+			tracks: this.savedState,
+		});
 
 		const updatedTracks = [...this.savedState];
 
@@ -66,6 +71,7 @@ export class DuplicateElementsCommand extends Command {
 						element,
 						id: newId,
 						startTime: element.startTime,
+						offset: insertionOffset,
 					}),
 				);
 			}
@@ -104,22 +110,33 @@ export class DuplicateElementsCommand extends Command {
 	getDuplicatedElements(): { trackId: string; elementId: string }[] {
 		return this.duplicatedElements;
 	}
+
+	private calculateInsertionOffset({
+		tracks,
+	}: {
+		tracks: TimelineTrack[];
+	}): number {
+		const totalDuration = calculateTotalDuration({ tracks });
+		return totalDuration > 0 ? Math.ceil(totalDuration) : 0;
+	}
 }
 
 function buildDuplicateElement({
 	element,
 	id,
 	startTime,
+	offset = 0,
 }: {
 	element: TimelineElement;
 	id: string;
 	startTime: number;
+	offset?: number;
 }): TimelineElement {
 	return {
 		...element,
 		id,
 		name: `${element.name} (copy)`,
-		startTime,
+		startTime: startTime + offset,
 		animations: cloneAnimations({
 			animations: element.animations,
 			shouldRegenerateKeyframeIds: true,
