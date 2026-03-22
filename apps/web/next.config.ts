@@ -16,7 +16,6 @@ const nextConfig: NextConfig = {
 	},
 	reactStrictMode: true,
 	productionBrowserSourceMaps: true,
-	output: "standalone",
 	images: {
 		remotePatterns: [
 			{
