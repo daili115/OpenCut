@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, boolean } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, boolean, jsonb } from "drizzle-orm/pg-core";
 
 export const users = pgTable("users", {
 	id: text("id").primaryKey(),
@@ -61,4 +61,43 @@ export const verifications = pgTable("verifications", {
 	),
 }).enableRLS();
 
-export * from "./cloud-schema";
+export const cloudProjects = pgTable("cloud_projects", {
+	id: text("id").primaryKey(),
+	userId: text("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+	name: text("name").notNull(),
+	thumbnail: text("thumbnail"),
+	duration: text("duration"),
+	version: text("version").default("1"),
+	settings: jsonb("settings").$type<any>(),
+	timelineViewState: jsonb("timeline_view_state").$type<any>(),
+	isPublic: boolean("is_public").default(false).notNull(),
+	createdAt: timestamp("created_at").$defaultFn(() => new Date()).notNull(),
+	updatedAt: timestamp("updated_at").$defaultFn(() => new Date()).notNull(),
+}).enableRLS();
+
+export const cloudScenes = pgTable("cloud_scenes", {
+	id: text("id").primaryKey(),
+	projectId: text("project_id").notNull().references(() => cloudProjects.id, { onDelete: "cascade" }),
+	name: text("name").notNull(),
+	isMain: boolean("is_main").default(false).notNull(),
+	tracks: jsonb("tracks").$type<any>(),
+	bookmarks: jsonb("bookmarks").$type<any>(),
+	createdAt: timestamp("created_at").$defaultFn(() => new Date()).notNull(),
+	updatedAt: timestamp("updated_at").$defaultFn(() => new Date()).notNull(),
+}).enableRLS();
+
+export const cloudMediaAssets = pgTable("cloud_media_assets", {
+	id: text("id").primaryKey(),
+	projectId: text("project_id").notNull().references(() => cloudProjects.id, { onDelete: "cascade" }),
+	userId: text("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+	name: text("name").notNull(),
+	type: text("type").notNull(),
+	size: text("size").notNull(),
+	storageUrl: text("storage_url").notNull(),
+	thumbnailUrl: text("thumbnail_url"),
+	width: text("width"),
+	height: text("height"),
+	duration: text("duration"),
+	ephemeral: boolean("ephemeral").default(false).notNull(),
+	createdAt: timestamp("created_at").$defaultFn(() => new Date()).notNull(),
+}).enableRLS();
